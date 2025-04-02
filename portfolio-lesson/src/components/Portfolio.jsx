@@ -1,442 +1,258 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Button,
-  Tabs,
-  Tab,
-  styled,
-  Checkbox,
-  TextField,
-  Menu,
-  MenuItem,
-  Chip,
-} from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import SearchIcon from '@mui/icons-material/Search';
-import UploadDialog from './UploadDialog';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import UploadModal from './UploadModal';
 
-const StyledTableContainer = styled(TableContainer)`
-  margin: 20px 0;
-  box-shadow: none;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-`;
-
-const HeaderBox = styled(Box)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 0;
-`;
-
-const SearchBox = styled(Box)`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
-  justify-content: space-between;
-`;
-
-const FilterBox = styled(Box)`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-`;
-
-const StyledTabs = styled(Tabs)`
-  .MuiTabs-indicator {
-    background-color: #1976d2;
-  }
-`;
-
-const StyledTab = styled(Tab)`
-  text-transform: none;
-  font-size: 14px;
-  &.Mui-selected {
-    color: #1976d2;
-  }
-`;
-
-const UploadButton = styled(Button)`
-  background-color: #1976d2;
-  text-transform: none;
-  border-radius: 8px;
-  padding: 6px 16px;
-  &:hover {
-    background-color: #1565c0;
-  }
-`;
-
-const SearchTextField = styled(TextField)`
-  width: 300px;
-  .MuiOutlinedInput-root {
-    border-radius: 8px;
-  }
-`;
-
-const FilterButton = styled(Button)`
-  text-transform: none;
-  border-radius: 4px;
-  padding: 6px 12px;
-  color: #1976d2;
-  border-color: #1976d2;
-  font-size: 14px;
-  &:hover {
-    border-color: #1565c0;
-    background-color: rgba(25, 118, 210, 0.04);
-  }
-`;
+const tabs = [
+  'All', 'Pre Sanction', 'NPA', '13(3) Responses', 'Symbolic Possession',
+  'DM Order', 'Physical Possession', 'Auctions',
+];
 
 const columns = [
-  { id: 'checkbox', label: '', sortable: false },
-  { id: 'id', label: 'Document ID', sortable: true },
-  { id: 'type', label: 'Type', sortable: true },
-  { id: 'applicant', label: 'Applicant', sortable: true },
-  { id: 'details', label: 'Details', sortable: true },
-  { id: 'assignedTo', label: 'Assigned To', sortable: true },
-  { id: 'amount', label: 'Amount', sortable: true },
-  { id: 'status', label: 'Status', sortable: true },
+  { id: 'checkbox', label: '' },
+  { id: 'id', label: 'Loan No.' },
+  { id: 'type', label: 'Loan Type' },
+  { id: 'borrower', label: 'Borrower' },
+  { id: 'baddress', label: 'Borrower Address' },
+  { id: 'coname', label: 'Co Borrower 1 Name' },
+  { id: 'caddress', label: 'Co Borrower 1 Address' },
+  { id: 'dpd', label: 'Current DPD' },
+  { id: 'sectiona', label: 'Section Amount' },
+  { id: 'region', label: 'Region' },
+  { id: 'status', label: 'Status' },
 ];
 
 const sampleData = [
   {
-    id: 'L345-2022',
-    type: 'Home Loan',
-    applicant: 'Vinitha',
-    details: 'RS 1Cr Core Function',
-    assignedTo: 'Gauri Shah',
-    amount: 10000000,
-    status: 'Won',
-    date: '2024-02-20',
+    id: "L28U3247",
+    type: "Home Loan",
+    borrower: "Vedika Sachar",
+    baddress: "83 Yogi Ganj, Kadapa-058720",
+    coname: "Divit Vora",
+    caddress: "24/543, Acharya Path Ongole-052360",
+    dpd: "91",
+    sectiona: "1934068",
+    region: "West",
+    status: "Under Process"
   },
   {
-    id: 'L346-2022',
-    type: 'Business Loan',
-    applicant: 'Rahul Mehta',
-    details: 'Working Capital Loan',
-    assignedTo: 'Priya Patel',
-    amount: 5000000,
-    status: 'In Progress',
-    date: '2024-03-15',
+    id: "L28U3243",
+    type: "Car Loan",
+    borrower: "Hrishita Agrawal",
+    baddress: "86/622, Deo Path, Berhampore 841186",
+    coname: "Mahika Tak",
+    caddress: "58 Tella Road, Sultan Pur Majira 918878",
+    dpd: "100",
+    sectiona: "1842143",
+    region: "North",
+    status: "Approved"
   },
   {
-    id: 'L347-2022',
-    type: 'Personal Loan',
-    applicant: 'Amit Kumar',
-    details: 'Education Expenses',
-    assignedTo: 'Raj Singh',
-    amount: 2000000,
-    status: 'Pending',
-    date: '2024-03-10',
+    id: "L28U3250",
+    type: "Car Loan",
+    borrower: "Priyansh Soman",
+    baddress: "H.No. 152 Andra Street Amritsar-417162",
+    coname: "Zaina Dara",
+    caddress: "H.No. 42, Srivastava Marg, Junagadh-191124",
+    dpd: "100",
+    sectiona: "4537889",
+    region: "East",
+    status: "Approved"
   },
   {
-    id: 'L348-2022',
-    type: 'Home Loan',
-    applicant: 'Sneha Reddy',
-    details: 'Property Purchase',
-    assignedTo: 'Gauri Shah',
-    amount: 15000000,
-    status: 'Approved',
-    date: '2024-03-01',
+    id: "L28U3248",
+    type: "Home Loan",
+    borrower: "Priyansh Chanda",
+    baddress: "24, Ray Chowk Guntakal 809332",
+    coname: "Zain Ghosh",
+    caddress: "H.No. 59, Dugar Street Kolhapur-543900",
+    dpd: "100",
+    sectiona: "2681712",
+    region: "West",
+    status: "Approved"
   },
   {
-    id: 'L349-2022',
-    type: 'Business Loan',
-    applicant: 'Karthik Menon',
-    details: 'Factory Expansion',
-    assignedTo: 'Priya Patel',
-    amount: 25000000,
-    status: 'Under Review',
-    date: '2024-03-18',
+    id: "L28U3260",
+    type: "Home Loan",
+    borrower: "Hrishita Sen",
+    baddress: "94/36 Barad, Hubli–Dharwad-408790",
+    coname: "Shrey Kala",
+    caddress: "63/86, Bhardwaj Street Bokaro 662204",
+    dpd: "100",
+    sectiona: "4456808",
+    region: "West",
+    status: "Rejected"
   },
   {
-    id: 'L350-2022',
-    type: 'Home Loan',
-    applicant: 'Meera Iyer',
-    details: 'Apartment Purchase',
-    assignedTo: 'Raj Singh',
-    amount: 8000000,
-    status: 'Approved',
-    date: '2024-03-20',
+    id: "L28U3265",
+    type: "Personal Loan",
+    borrower: "Vivaan Virk",
+    baddress: "H.No. 653 Dada Ganj Ichalkaranji 279923",
+    coname: "Elakshi Chahal",
+    caddress: "16/45 Divan Road Jabalpur 962051",
+    dpd: "76",
+    sectiona: "3863514",
+    region: "West",
+    status: "Mandate Pending"
   },
   {
-    id: 'L351-2022',
-    type: 'Personal Loan',
-    applicant: 'Sanjay Gupta',
-    details: 'Medical Emergency',
-    assignedTo: 'Gauri Shah',
-    amount: 1500000,
-    status: 'Urgent',
-    date: '2024-03-21',
+    id: "L28U3264",
+    type: "Personal Loan",
+    borrower: "Nirvaan Mander",
+    baddress: "543 Singhal Street, Bhalswa Jahangir Pur-348320",
+    coname: "Vihaan Dua",
+    caddress: "H.No. 115, Saha Road Singrauli 049374",
+    dpd: "90",
+    sectiona: "1256683",
+    region: "South",
+    status: "KYC Pending"
   },
   {
-    id: 'L352-2022',
-    type: 'Business Loan',
-    applicant: 'Pradeep Kumar',
-    details: 'Inventory Finance',
-    assignedTo: 'Priya Patel',
-    amount: 7500000,
-    status: 'In Progress',
-    date: '2024-03-19',
+    id: "L28U3266",
+    type: "Personal Loan",
+    borrower: "Nirvi Sahni",
+    baddress: "41/42, Dua, Amroha-741195",
+    coname: "Dhanuk Lalla",
+    caddress: "48/41, Garde Path Uluberia 709356",
+    dpd: "75",
+    sectiona: "2687368",
+    region: "East",
+    status: "Waiting Approval"
   },
   {
-    id: 'L353-2022',
-    type: 'Home Loan',
-    applicant: 'Anita Desai',
-    details: 'Villa Purchase',
-    assignedTo: 'Raj Singh',
-    amount: 20000000,
-    status: 'Pending',
-    date: '2024-03-22',
+    id: "L28U3267",
+    type: "Personal Loan",
+    borrower: "Samaira Jain",
+    baddress: "79/10 Barad Zila Thoothukudi 606938",
+    coname: "Chirag Tripathi",
+    caddress: "23/11 Ravel Street, Panchkula-008035",
+    dpd: "76",
+    sectiona: "3617146",
+    region: "South",
+    status: "Granted"
   },
   {
-    id: 'L354-2022',
-    type: 'Personal Loan',
-    applicant: 'Rajesh Shah',
-    details: 'Wedding Expenses',
-    assignedTo: 'Gauri Shah',
-    amount: 3000000,
-    status: 'Approved',
-    date: '2024-03-17',
-  },
-  {
-    id: 'L355-2022',
-    type: 'Business Loan',
-    applicant: 'Maya Enterprises',
-    details: 'Equipment Purchase',
-    assignedTo: 'Priya Patel',
-    amount: 12000000,
-    status: 'Won',
-    date: '2024-03-16',
-  },
-  {
-    id: 'L356-2022',
-    type: 'Home Loan',
-    applicant: 'Vikram Singh',
-    details: 'Plot Purchase',
-    assignedTo: 'Raj Singh',
-    amount: 5500000,
-    status: 'Under Review',
-    date: '2024-03-23',
+    id: "L28U3269",
+    type: "Personal Loan",
+    borrower: "Aradhya Jayaraman",
+    baddress: "410, Vohra Zila Moradabad 963541",
+    coname: "Shaan Hora",
+    caddress: "35/41, Bajaj Nagar Nagaon-504713",
+    dpd: "76",
+    sectiona: "1383439",
+    region: "South",
+    status: "Approved"
   }
 ];
 
-const tabs = [
-  'All',
-  'Pre Sanction',
-  'NPA',
-  'YSLD Responses',
-  'Symbolic Possession',
-  'DM Order',
-  'Physical Possession',
-  'Auctions',
-];
-
 function Portfolio() {
-  const [selectedTab, setSelectedTab] = useState(0);
-  const [columnMenuAnchor, setColumnMenuAnchor] = useState(null);
-  const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
-  const [visibleColumns, setVisibleColumns] = useState(columns.map(col => col.id));
-  const [activeFilters, setActiveFilters] = useState([]);
+  const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [filterType, setFilterType] = useState('All');
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
 
-  // Filter data based on search query
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    console.log(`Selected Tab: ${tab}`);
+    // Add your filtering logic based on the active tab here if needed
+  };
+
+  const handleFilterChange = () => {
+    console.log(`Filtering by Type: ${filterType}, Status: ${filterStatus}`);
+  };
+
   const filteredData = sampleData.filter(row => {
     const searchLower = searchQuery.toLowerCase();
     return (
-      row.id.toLowerCase().includes(searchLower) ||
-      row.applicant.toLowerCase().includes(searchLower) ||
-      row.type.toLowerCase().includes(searchLower) ||
-      row.details.toLowerCase().includes(searchLower) ||
-      row.assignedTo.toLowerCase().includes(searchLower) ||
-      row.status.toLowerCase().includes(searchLower) ||
-      row.amount.toString().includes(searchQuery)
+      (filterType === 'All' || row.type === filterType) &&
+      (filterStatus === 'All' || row.status === filterStatus) &&
+      (activeTab === 'All' || true) // Add your tab-based filtering logic here
+      &&
+      Object.values(row).some(value => value.toString().toLowerCase().includes(searchLower))
     );
   });
 
-  const handleTabChange = (event, newValue) => {
-    setSelectedTab(newValue);
-  };
-
-  const handleColumnMenuOpen = (event) => {
-    setColumnMenuAnchor(event.currentTarget);
-  };
-
-  const handleColumnMenuClose = () => {
-    setColumnMenuAnchor(null);
-  };
-
-  const handleFilterMenuOpen = (event) => {
-    setFilterMenuAnchor(event.currentTarget);
-  };
-
-  const handleFilterMenuClose = () => {
-    setFilterMenuAnchor(null);
-  };
-
-  const toggleColumn = (columnId) => {
-    setVisibleColumns(prev =>
-      prev.includes(columnId)
-        ? prev.filter(id => id !== columnId)
-        : [...prev, columnId]
-    );
-  };
-
-  const addFilter = (filter) => {
-    setActiveFilters(prev => [...prev, filter]);
-    handleFilterMenuClose();
-  };
-
-  const removeFilter = (filter) => {
-    setActiveFilters(prev => prev.filter(f => f !== filter));
-  };
-
-  const handleUploadClick = () => {
-    setIsUploadDialogOpen(true);
-  };
-
-  const handleUploadDialogClose = () => {
-    setIsUploadDialogOpen(false);
-  };
-
   return (
-    <Box>
-      <HeaderBox>
-        <StyledTabs
-          value={selectedTab}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-        >
-          {tabs.map((tab, index) => (
-            <StyledTab key={tab} label={tab} />
-          ))}
-        </StyledTabs>
-        <UploadButton variant="contained" onClick={handleUploadClick}>
-          Upload Document
-        </UploadButton>
-      </HeaderBox>
+    <div className="container mt-4">
+      <ul className="nav nav-tabs mb-3">
+        {tabs.map(tab => (
+          <li className="nav-item" key={tab}>
+            <button
+              className={`nav-link ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => handleTabClick(tab)}
+            >
+              {tab}
+            </button>
+          </li>
+        ))}
+      </ul>
 
-      <SearchBox>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <SearchTextField
-            placeholder="Search in all columns..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />,
-            }}
-          />
-          <FilterButton
-            variant="outlined"
-            onClick={handleColumnMenuOpen}
-            endIcon={<KeyboardArrowDownIcon />}
-          >
-            Columns
-          </FilterButton>
-          <FilterButton
-            variant="outlined"
-            onClick={handleFilterMenuOpen}
-            endIcon={<KeyboardArrowDownIcon />}
-          >
-            Filter
-          </FilterButton>
-        </Box>
-      </SearchBox>
+      <div className="d-flex justify-content-between align-items-center my-3">
+        <input
+          type="text"
+          className="form-control w-25"
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
 
-      {activeFilters.length > 0 && (
-        <FilterBox>
-          {activeFilters.map((filter) => (
-            <Chip
-              key={filter}
-              label={filter}
-              onDelete={() => removeFilter(filter)}
-              size="small"
-            />
-          ))}
-        </FilterBox>
-      )}
+        <div>
+          <button className="btn btn-primary me-2" onClick={() => setIsUploadOpen(true)}>
+            Upload Document
+          </button>
 
-      <StyledTableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {columns
-                .filter(column => visibleColumns.includes(column.id))
-                .map(column => (
-                  <TableCell key={column.id}>
-                    {column.id === 'checkbox' ? (
-                      <Checkbox size="small" />
+          <select className="form-select d-inline w-auto mx-2" onChange={(e) => setFilterType(e.target.value)}>
+            <option value="All">All Loan Types</option>
+            <option value="Home Loan">Home Loan</option>
+            <option value="Car Loan">Car Loan</option>
+            <option value="Personal Loan">Personal Loan</option>
+          </select>
+
+          <select className="form-select d-inline w-auto mx-2" onChange={(e) => setFilterStatus(e.target.value)}>
+            <option value="All">All Status</option>
+            <option value="Under Process">Under Process</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+
+          <button className="btn btn-outline-secondary" onClick={handleFilterChange}>Filter</button>
+        </div>
+      </div>
+
+      <div className="table-responsive">
+        <table className="table table-bordered">
+          <thead className="table-light">
+            <tr>
+              {columns.map(col => (
+                <th key={col.id}>{col.id === 'checkbox' ? <input type="checkbox" /> : col.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.map(row => (
+              <tr key={row.id}>
+                {columns.map(col => (
+                  <td key={col.id}>
+                    {col.id === 'checkbox' ? (
+                      <input type="checkbox" />
+                    ) : col.id === 'id' ? (
+                      <span style={{ textDecoration: 'underline', color: 'blue' }}>
+                        {row[col.id] || '-'}
+                      </span>
                     ) : (
-                      column.label
+                      row[col.id] || '-'
                     )}
-                  </TableCell>
+                  </td>
                 ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredData.map((row) => (
-              <TableRow key={row.id}>
-                {columns
-                  .filter(column => visibleColumns.includes(column.id))
-                  .map(column => (
-                    <TableCell key={column.id}>
-                      {column.id === 'checkbox' ? (
-                        <Checkbox size="small" />
-                      ) : column.id === 'amount' ? (
-                        `₹${row[column.id].toLocaleString()}`
-                      ) : (
-                        row[column.id]
-                      )}
-                    </TableCell>
-                  ))}
-              </TableRow>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
-      </StyledTableContainer>
+          </tbody>
+        </table>
+      </div>
 
-      <Menu
-        anchorEl={columnMenuAnchor}
-        open={Boolean(columnMenuAnchor)}
-        onClose={handleColumnMenuClose}
-      >
-        {columns
-          .filter(column => column.id !== 'checkbox')
-          .map(column => (
-            <MenuItem key={column.id} onClick={() => toggleColumn(column.id)}>
-              <Checkbox
-                checked={visibleColumns.includes(column.id)}
-                size="small"
-              />
-              {column.label}
-            </MenuItem>
-          ))}
-      </Menu>
-
-      <Menu
-        anchorEl={filterMenuAnchor}
-        open={Boolean(filterMenuAnchor)}
-        onClose={handleFilterMenuClose}
-      >
-        <MenuItem onClick={() => addFilter('Status: Won')}>Status: Won</MenuItem>
-        <MenuItem onClick={() => addFilter('Type: Home Loan')}>
-          Type: Home Loan
-        </MenuItem>
-        <MenuItem onClick={() => addFilter('Amount > 10L')}>Amount > 10L</MenuItem>
-      </Menu>
-
-      <UploadDialog open={isUploadDialogOpen} onClose={handleUploadDialogClose} />
-    </Box>
+      <UploadModal isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
+    </div>
   );
 }
 
-export default Portfolio; 
+export default Portfolio;
