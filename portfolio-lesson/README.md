@@ -1,3 +1,7 @@
+#Documentation pdf link 
+https://drive.google.com/file/d/1pjuRZ6EsDKugasfDNt6sw6aIN-c9axid/view?usp=sharing
+
+
 # Portfolio Management System
 
 A React-based portfolio management system for handling loan documents and related information.
